@@ -1,8 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import routes from './routes/routes.js'
+import connectDB from './config/connectdb.js'
 
 const app = express()
+connectDB()
 app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 const port = 8000

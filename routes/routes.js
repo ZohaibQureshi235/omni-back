@@ -1,13 +1,16 @@
 import express from 'express'
-import { PostImage, GetImage, updateImageViews, updateImagedowload, updateImageshare, searchImage } from '../controller/ImageController.js'
+import ImageController from '../controller/ImageController.js'
 const router = express.Router()
 
-router.get('/', (req, res) => res.send('Hello There'))
-router.post('/post-image', PostImage)
-router.get('/get-images', GetImage)
-router.post('/views/:imageId', updateImageViews)
-router.post('/download/:imageId', updateImagedowload)
-router.post('/share/:imageId', updateImageshare)
-router.post('/search/:searchTerms', searchImage)
+router.get('/', (req, res) => {
+	res.send('Hello There!')
+})
+
+router.post('/post-image', (req, res) => ImageController.PostImage(req, res))
+router.get('/get-images', (req, res) => ImageController.GetImage(req, res))
+router.post('/views/:imageId', (req, res) => ImageController.updateImageViews(req, res))
+router.post('/download/:imageId', (req, res) => ImageController.updateImagedowload(req, res))
+router.post('/share/:imageId', (req, res) => ImageController.updateImageshare(req, res))
+router.post('/search/:searchTerms', (req, res) => ImageController.searchImage(req, res))
 
 export default router
