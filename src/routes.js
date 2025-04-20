@@ -1,5 +1,5 @@
 import express from 'express'
-import ImageController from '../controller/ImageController.js'
+import ImageController from '../Controller/ImageController.js'
 const router = express.Router()
 
 router.get('/', (req, res) => {

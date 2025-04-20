@@ -1,5 +1,5 @@
 import ImagesModal from '../modals/ImagesModal.js'
-import Pagination from '../middlewares/Pagination.js'
+import Pagination from '../Help/Pagination.js'
 
 class ImageController {
 	async PostImage(req, res) {
