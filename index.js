@@ -1,25 +1,15 @@
 const express = require('express')
-const routes = require('./routes/routes.js')
-const connectDB = require('./config/connectdb.js')
 const cors = require('cors')
+const routes = require('./routes/routes.js')
 
 const app = express()
-connectDB()
-app.use(
-	cors({
-		origin: 'http://localhost:3000',
-		credentials: true
-	})
-)
 app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+const port = 8000
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001'], methods: ['GET', 'POST', 'PUT', 'DELETE'], credentials: true }))
 
-app.use('/', routes)
+app.use('/api', routes)
 
-app.get('/', (req, res) => {
-	res.send('Hello There')
-})
-
-app.listen(8000, () => {
-	console.log('port is running')
+app.listen(port, () => {
+	console.log(`http://localhost:${port}`)
 })
