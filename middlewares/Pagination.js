@@ -31,4 +31,4 @@ const Pagination = (data, total, currentPage, perPage) => {
 	}
 }
 
-module.exports = Pagination
+export default Pagination

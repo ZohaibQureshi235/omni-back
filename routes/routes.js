@@ -1,5 +1,5 @@
-const express = require('express')
-const { PostImage, GetImage, updateImageViews, updateImagedowload, updateImageshare, searchImage } = require('../controller/ImageController')
+import express from 'express'
+import { PostImage, GetImage, updateImageViews, updateImagedowload, updateImageshare, searchImage } from '../controller/ImageController.js'
 const router = express.Router()
 
 router.get('/', (req, res) => res.send('Hello There'))
@@ -10,4 +10,4 @@ router.post('/download/:imageId', updateImagedowload)
 router.post('/share/:imageId', updateImageshare)
 router.post('/search/:searchTerms', searchImage)
 
-module.exports = router
+export default router

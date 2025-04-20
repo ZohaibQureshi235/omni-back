@@ -1,5 +1,5 @@
-const ImagesModal = require('../modals/ImagesModal')
-const Pagination = require('../middlewares/Pagination')
+import ImagesModal from '../modals/ImagesModal.js'
+import Pagination from '../middlewares/Pagination.js'
 
 const PostImage = async (req, res) => {
 	try {
@@ -102,4 +102,4 @@ const searchImage = async (req, res) => {
 	}
 }
 
-module.exports = { PostImage, GetImage, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage }
+export { PostImage, GetImage, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage }
