@@ -2,10 +2,6 @@ const express = require('express')
 const { PostImage, GetImage, updateImageViews, updateImagedowload, updateImageshare, searchImage } = require('../controller/ImageController')
 const router = express.Router()
 
-router.get('/', (req, res) => {
-	res.send('Hello There')
-})
-
 router.post('/api/post-image', PostImage)
 router.get('/api/get-images', GetImage)
 router.post('/api/views/:imageId', updateImageViews)

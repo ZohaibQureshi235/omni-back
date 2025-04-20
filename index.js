@@ -16,6 +16,10 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
 app.use('/', routes)
 
+app.get('/', (req, res) => {
+	res.send('Hello There')
+})
+
 app.listen(8000, () => {
 	console.log('port is running')
 })
