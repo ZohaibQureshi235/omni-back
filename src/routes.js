@@ -14,6 +14,6 @@ router.post('/views/:imageId', updateImageViews)
 router.post('/like/:imageId', updatedImageLike)
 router.post('/download/:imageId', updateImagedowload)
 router.post('/share/:imageId', updateImageshare)
-router.post('/search/:searchTerms', searchImage)
+router.post('/search/:slug', searchImage)
 
 export default router
