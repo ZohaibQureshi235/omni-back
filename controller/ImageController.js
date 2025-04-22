@@ -136,8 +136,8 @@ const findImage = async (req, res) => {
 			return res.status(404).json({ success: false, message: 'Not found' })
 		}
 		const relatedImages = await ImagesModal.find({
-			_id: { $ne: imageId },
-			keywords: { $in: image.keywords }
+			_id: { $ne: image._id },
+			$or: [{ keywords: { $regex: image.keywords } }]
 		})
 		return res.status(200).json({ success: true, message: 'fetched successfully', image, related_images: relatedImages })
 	} catch (error) {
