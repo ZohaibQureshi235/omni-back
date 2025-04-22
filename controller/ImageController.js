@@ -162,4 +162,4 @@ const searchImage = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage }
+export { PostImage, GetImage, updatedImageLike, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage }
