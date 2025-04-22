@@ -56,7 +56,7 @@ const PostImage = async (req, res) => {
 
 const GetImage = async (req, res) => {
 	try {
-		const { page } = req.query
+		const { page } = req.params
 		const offset = (page - 1) * 10
 		const TotalImage = await ImagesModal.countDocuments()
 		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(8)
@@ -70,7 +70,7 @@ const GetImage = async (req, res) => {
 
 const updateImageViews = async (req, res) => {
 	try {
-		const { imageId } = req.query
+		const { imageId } = req.params
 		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { views: 1 } }, { new: true })
 
 		if (!updatedImage) {
@@ -85,7 +85,7 @@ const updateImageViews = async (req, res) => {
 
 const updatedImageLike = async (req, res) => {
 	try {
-		const { imageId } = req.query
+		const { imageId } = req.params
 		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { like: 1 } }, { new: true })
 
 		if (!updatedImage) {
@@ -100,7 +100,7 @@ const updatedImageLike = async (req, res) => {
 
 const updateImagedowload = async (req, res) => {
 	try {
-		const { imageId } = req.query
+		const { imageId } = req.params
 		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { downloads: 1 } }, { new: true })
 
 		if (!updatedImage) {
@@ -115,7 +115,7 @@ const updateImagedowload = async (req, res) => {
 
 const updateImageshare = async (req, res) => {
 	try {
-		const { imageId } = req.query
+		const { imageId } = req.params
 		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { share: 1 } }, { new: true })
 
 		if (!updatedImage) {
@@ -147,7 +147,7 @@ const findImage = async (req, res) => {
 
 const searchImage = async (req, res) => {
 	try {
-		const { searchTerms } = req.query
+		const { searchTerms } = req.params
 		const offset = (page - 1) * 10
 
 		const Images = await ImagesModal.find({
