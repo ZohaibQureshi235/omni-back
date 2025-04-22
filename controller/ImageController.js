@@ -124,7 +124,7 @@ const findImage = async (req, res) => {
 			_id: { $ne: imageId },
 			keywords: { $in: image.keywords }
 		})
-		return res.status(500).json({ success: true, message: 'fetched successfully', image, related_images: relatedImages })
+		return res.status(200).json({ success: true, message: 'fetched successfully', image, related_images: relatedImages })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
