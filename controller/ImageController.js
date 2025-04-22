@@ -147,11 +147,11 @@ const findImage = async (req, res) => {
 
 const searchImage = async (req, res) => {
 	try {
-		const { searchTerms } = req.params
+		const { slug } = req.params
 		const offset = (page - 1) * 10
 
 		const Images = await ImagesModal.find({
-			$or: [{ name: { $regex: searchTerms } }, { description: { $regex: searchTerms } }, { keywords: { $regex: searchTerms } }]
+			$or: [{ name: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
 		})
 			.skip(offset)
 			.limit(8)
