@@ -116,7 +116,7 @@ const updateImageshare = async (req, res) => {
 const findImage = async (req, res) => {
 	try {
 		const { imageId } = req.body
-		const image = await Image.findById(imageId)
+		const image = await Image.findOne({ _id: imageId })
 		if (!image) {
 			return res.status(404).json({ success: false, message: 'Not found' })
 		}
