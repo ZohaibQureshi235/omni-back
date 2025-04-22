@@ -18,7 +18,7 @@ const ImageSchema = new mongoose.Schema(
 		},
 
 		keywords: {
-			type: [String],
+			type: String,
 			default: []
 		},
 

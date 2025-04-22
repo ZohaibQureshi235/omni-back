@@ -1,10 +1,53 @@
 import ImagesModal from '../modals/ImagesModal.js'
+import { v2 as cloudinary } from 'cloudinary'
+import sharp from 'sharp'
 import Pagination from '../Help/Pagination.js'
+
+cloudinary.config({
+	cloud_name: 'dobuzvxes',
+	api_key: '339545666221576',
+	api_secret: 'ALV9xB-T87Bryo3luxgoT86d_Ow'
+})
 
 const PostImage = async (req, res) => {
 	try {
-		await ImagesModal.create(req.body)
-		return res.status(200).json({ success: true, message: 'Successfully created image' })
+		const { title, desc, keywords } = req.body
+		const file = req.file
+
+		if (!file) {
+			return res.status(400).json({ success: false, message: 'No image file provided' })
+		}
+
+		// Compress image with sharp
+		const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 75, progressive: true }).toBuffer()
+
+		// Upload to Cloudinary
+		const uploadStream = cloudinary.uploader.upload_stream(
+			{
+				resource_type: 'image',
+				public_id: title,
+				tags: keywords
+			},
+			async (error, result) => {
+				if (error) {
+					return res.status(500).json({ success: false, message: error.message })
+				}
+
+				const imageData = {
+					title,
+					desc,
+					keywords,
+					image: result.secure_url,
+					cloudinaryPublicId: result.public_id
+				}
+
+				await ImagesModal.create(imageData)
+
+				return res.status(200).json({ success: true, message: 'Successfully uploaded image' })
+			}
+		)
+
+		uploadStream.end(compressedImageBuffer)
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
