@@ -56,7 +56,7 @@ const PostImage = async (req, res) => {
 
 const GetImage = async (req, res) => {
 	try {
-		const { page } = req.params
+		const { page } = req.query
 		const offset = (page - 1) * 10
 		const TotalImage = await ImagesModal.countDocuments()
 		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(8)
@@ -148,6 +148,7 @@ const findImage = async (req, res) => {
 const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
+		const { page } = req.qury
 		const offset = (page - 1) * 10
 
 		const Images = await ImagesModal.find({
@@ -156,7 +157,7 @@ const searchImage = async (req, res) => {
 			.skip(offset)
 			.limit(8)
 		const data = Pagination(Images, Images.length, page, 8)
-		return res.status(500).json({ success: true, message: 'fetched successfully', data })
+		return res.status(200).json({ success: true, message: 'fetched successfully', data })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
