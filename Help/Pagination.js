@@ -1,7 +1,7 @@
-const Pagination = (data, total, currentPage, perPage) => {
-	const lastPage = Math.ceil(total / perPage)
-	const from = (currentPage - 1) * perPage + 1
-	const to = Math.min(currentPage * perPage, total)
+const Pagination = (data, total, currentPage) => {
+	const lastPage = Math.ceil(total / 8)
+	const from = (currentPage - 1) * 8 + 1
+	const to = Math.min(currentPage * 8, total)
 	const baseUrl = 'http://localhost:8000/api/get-images'
 
 	const links = []
@@ -24,7 +24,7 @@ const Pagination = (data, total, currentPage, perPage) => {
 		links,
 		next_page_url: currentPage < lastPage ? `${baseUrl}?page=${currentPage + 1}` : null,
 		path: baseUrl,
-		per_page: perPage,
+		per_page: 8,
 		prev_page_url: currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null,
 		to,
 		total
