@@ -59,10 +59,9 @@ const GetImage = async (req, res) => {
 		const { page } = req.query
 		const offset = (page - 1) * 10
 		const TotalImage = await ImagesModal.countDocuments()
-		const Images = await ImagesModal.find({}, 'image views _id')
-		// const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(8)
-		// const data = Pagination(Images, TotalImage, page)
-		return res.status(200).json({ success: true, message: 'Successfully fetched', data: Images })
+		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(8)
+		const data = Pagination(Images, TotalImage, page)
+		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
