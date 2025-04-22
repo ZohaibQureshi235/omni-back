@@ -148,7 +148,7 @@ const findImage = async (req, res) => {
 const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
-		const { page } = req.qury
+		const { page = 1 } = req.query
 		const offset = (page - 1) * 10
 
 		const Images = await ImagesModal.find({
