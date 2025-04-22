@@ -36,6 +36,12 @@ const ImageSchema = new mongoose.Schema(
 			type: Number,
 			default: 0
 		},
+
+		like: {
+			type: Number,
+			default: 0
+		},
+
 		slug: {
 			type: String,
 			required: true

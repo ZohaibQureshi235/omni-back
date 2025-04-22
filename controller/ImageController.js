@@ -83,6 +83,21 @@ const updateImageViews = async (req, res) => {
 	}
 }
 
+const updatedImageLike = async (req, res) => {
+	try {
+		const { imageId } = req.query
+		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { like: 1 } }, { new: true })
+
+		if (!updatedImage) {
+			return res.status(404).json({ success: false, message: 'image not found' })
+		}
+
+		return res.status(200).json({ success: true, message: 'liked' })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
 const updateImagedowload = async (req, res) => {
 	try {
 		const { imageId } = req.query
