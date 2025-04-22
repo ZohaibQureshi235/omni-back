@@ -71,7 +71,7 @@ const GetImage = async (req, res) => {
 const updateImageViews = async (req, res) => {
 	try {
 		const { imageId } = req.query
-		const updatedImage = await Image.findByIdAndUpdate(imageId, { $inc: { views: 1 } }, { new: true })
+		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { views: 1 } }, { new: true })
 
 		if (!updatedImage) {
 			return res.status(404).json({ success: false, message: 'image not found' })
@@ -86,7 +86,7 @@ const updateImageViews = async (req, res) => {
 const updateImagedowload = async (req, res) => {
 	try {
 		const { imageId } = req.query
-		const updatedImage = await Image.findByIdAndUpdate(imageId, { $inc: { downloads: 1 } }, { new: true })
+		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { downloads: 1 } }, { new: true })
 
 		if (!updatedImage) {
 			return res.status(404).json({ success: false, message: 'image not found' })
@@ -101,7 +101,7 @@ const updateImagedowload = async (req, res) => {
 const updateImageshare = async (req, res) => {
 	try {
 		const { imageId } = req.query
-		const updatedImage = await Image.findByIdAndUpdate(imageId, { $inc: { share: 1 } }, { new: true })
+		const updatedImage = await ImagesModal.findByIdAndUpdate(imageId, { $inc: { share: 1 } }, { new: true })
 
 		if (!updatedImage) {
 			return res.status(404).json({ success: false, message: 'image not found' })
@@ -116,7 +116,7 @@ const updateImageshare = async (req, res) => {
 const findImage = async (req, res) => {
 	try {
 		const { imageId } = req.body
-		const image = await Image.findOne({ _id: imageId })
+		const image = await ImagesModal.findOne({ _id: imageId })
 		if (!image) {
 			return res.status(404).json({ success: false, message: 'Not found' })
 		}
@@ -135,7 +135,7 @@ const searchImage = async (req, res) => {
 		const { searchTerms } = req.query
 		const offset = (page - 1) * 10
 
-		const Images = await Image.find({
+		const Images = await ImagesModal.find({
 			$or: [{ name: { $regex: searchTerms } }, { description: { $regex: searchTerms } }, { keywords: { $regex: searchTerms } }]
 		})
 			.skip(offset)
