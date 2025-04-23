@@ -1,4 +1,4 @@
-import ImagesModal, { SectionsModal } from '../modals/ImagesModal.js'
+import { ImagesModal, SectionsModal } from '../modals/ImagesModal.js'
 import { v2 as cloudinary } from 'cloudinary'
 import sharp from 'sharp'
 import Pagination from '../Help/Pagination.js'
@@ -63,10 +63,10 @@ const PostImage = async (req, res) => {
 
 const GetImage = async (req, res) => {
 	try {
-		const { page } = req.query
+		const { page = 1 } = req.query
 		const offset = (page - 1) * 10
 		const TotalImage = await ImagesModal.countDocuments()
-		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(8)
+		const Images = await ImagesModal.find({}, 'image section views _id').skip(offset).limit(8)
 		const data = Pagination(Images, TotalImage, page)
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
 	} catch (error) {
