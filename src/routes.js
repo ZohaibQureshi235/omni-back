@@ -1,5 +1,5 @@
 import express from 'express'
-import { PostImage, GetImage, updateImageViews, updatedImageLike, updateImagedowload, updateImageshare, searchImage, findImage } from '../controller/ImageController.js'
+import { PostImage, GetImage, updateImageViews, updatedImageLike, updateImagedowload, updateImageshare, searchImage, findImage, sectionList } from '../controller/ImageController.js'
 import multer from 'multer'
 
 const router = express.Router()
@@ -15,5 +15,6 @@ router.post('/like/:imageId', updatedImageLike)
 router.post('/download/:imageId', updateImagedowload)
 router.post('/share/:imageId', updateImageshare)
 router.get('/search/:slug', searchImage)
+router.get('/section', sectionList)
 
 export default router

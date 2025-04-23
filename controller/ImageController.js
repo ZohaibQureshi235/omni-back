@@ -1,4 +1,4 @@
-import ImagesModal from '../modals/ImagesModal.js'
+import ImagesModal, { SectionsModal } from '../modals/ImagesModal.js'
 import { v2 as cloudinary } from 'cloudinary'
 import sharp from 'sharp'
 import Pagination from '../Help/Pagination.js'
@@ -11,8 +11,13 @@ cloudinary.config({
 
 const PostImage = async (req, res) => {
 	try {
-		const { title, desc, keywords } = req.body
+		const { title, desc, keywords, section } = req.body
 		const file = req.file
+
+		const existingSection = await SectionsModal.findOne({ section_list: section })
+		if (!existingSection) {
+			await SectionsModal.create({ section_list: section })
+		}
 
 		if (!file) {
 			return res.status(400).json({ success: false, message: 'No image file provided' })
@@ -26,7 +31,8 @@ const PostImage = async (req, res) => {
 			{
 				resource_type: 'image',
 				public_id: title,
-				tags: keywords
+				tags: keywords,
+				section
 			},
 			async (error, result) => {
 				if (error) {
@@ -36,6 +42,7 @@ const PostImage = async (req, res) => {
 				const imageData = {
 					title,
 					desc,
+					section,
 					keywords,
 					image: result.secure_url,
 					cloudinaryPublicId: result.public_id,
@@ -170,4 +177,13 @@ const searchImage = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, updatedImageLike, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage }
+const sectionList = async (req, res) => {
+	try {
+		const sections = await SectionsModal.find()
+		return res.status(200).json({ success: true, message: 'fetched successfully', sections })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+export { PostImage, GetImage, updatedImageLike, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList }

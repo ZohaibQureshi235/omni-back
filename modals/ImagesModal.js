@@ -7,6 +7,11 @@ const ImageSchema = new mongoose.Schema(
 			required: true
 		},
 
+		section: {
+			type: String,
+			required: true
+		},
+
 		title: {
 			type: String,
 			required: true
@@ -50,4 +55,14 @@ const ImageSchema = new mongoose.Schema(
 	{ timestamps: true }
 )
 
-export default mongoose.model('Image', ImageSchema)
+const SectionSchema = new mongoose.Schema({
+	section_list: {
+		type: String,
+		required: true
+	}
+})
+
+const ImagesModal = mongoose.model('Image', ImageSchema)
+const SectionsModal = mongoose.model('Section', SectionSchema)
+
+export { ImagesModal, SectionsModal }
