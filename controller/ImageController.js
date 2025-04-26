@@ -238,4 +238,4 @@ const fetchCat = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage }
+export { PostImage, GetImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage }
