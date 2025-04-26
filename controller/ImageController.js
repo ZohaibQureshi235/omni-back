@@ -135,6 +135,9 @@ const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
 		let image = null
+		const { page = 1 } = req.query
+
+		const offset = (page - 1) * 16
 
 		// Check if slug is a valid ObjectId
 		if (mongoose.Types.ObjectId.isValid(slug)) {
@@ -162,23 +165,24 @@ const searchImage = async (req, res) => {
 				related_images: relatedImages
 			})
 		} else {
-			const { page = 1 } = req.query
-			const offset = (page - 1) * 16
-
 			const Images = await ImagesModal.find({
 				$or: [{ name: { $regex: slug, $options: 'i' } }, { section: { $regex: slug, $options: 'i' } }, { slug: { $regex: slug, $options: 'i' } }, { description: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }]
 			})
 				.skip(offset)
 				.limit(16)
 
-			const data = Pagination(Images, Images.length, page, slug)
+			if (Images.length > 0) {
+				const data = Pagination(Images, Images.length, page, slug)
 
-			return res.status(200).json({
-				success: true,
-				page_type: 'search',
-				message: 'fetched successfully',
-				data
-			})
+				return res.status(200).json({
+					success: true,
+					page_type: 'search',
+					message: 'fetched successfully',
+					data
+				})
+			} else {
+				return res.status(404).json({ success: false, message: 'No page found' })
+			}
 		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
