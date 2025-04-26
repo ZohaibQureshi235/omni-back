@@ -67,7 +67,7 @@ const GetImage = async (req, res) => {
 		const offset = (page - 1) * 10
 		const TotalImage = await ImagesModal.countDocuments()
 		const Images = await ImagesModal.find({}, 'image section views _id').skip(offset).limit(8)
-		const data = Pagination(Images, TotalImage, page)
+		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
@@ -170,7 +170,7 @@ const searchImage = async (req, res) => {
 		})
 			.skip(offset)
 			.limit(8)
-		const data = Pagination(Images, Images.length, page, 8)
+		const data = Pagination(Images, Images.length, page, `/${slug}`)
 		return res.status(200).json({ success: true, message: 'fetched successfully', data })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
