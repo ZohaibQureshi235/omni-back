@@ -138,10 +138,7 @@ const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
 		const image = await ImagesModal.findOne({ _id: slug })
-		if (!image) {
-			return res.status(404).json({ success: false, message: 'Not found' })
-		}
-		if (slug) {
+		if (image) {
 			const keywordArray = image.keywords.split(',').filter(Boolean)
 
 			const keywordRegexConditions = keywordArray.map((word) => ({
