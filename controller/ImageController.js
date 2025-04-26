@@ -134,44 +134,38 @@ const updateImageshare = async (req, res) => {
 	}
 }
 
-const findImage = async (req, res) => {
-	try {
-		const { imageId } = req.parms
-		const image = await ImagesModal.findOne({ _id: imageId })
-		if (!image) {
-			return res.status(404).json({ success: false, message: 'Not found' })
-		}
-
-		const keywordArray = image.keywords.split(',').filter(Boolean)
-
-		const keywordRegexConditions = keywordArray.map((word) => ({
-			keywords: { $regex: word }
-		}))
-
-		const relatedImages = await ImagesModal.find({
-			_id: { $ne: image._id },
-			$or: keywordRegexConditions
-		})
-
-		return res.status(200).json({ success: true, page_type: 'image', message: 'fetched successfully', image, related_images: relatedImages })
-	} catch (error) {
-		return res.status(500).json({ success: false, message: error.message })
-	}
-}
-
 const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
-		const { page = 1 } = req.query
-		const offset = (page - 1) * 10
+		const image = await ImagesModal.findOne({ _id: slug })
+		if (!image) {
+			return res.status(404).json({ success: false, message: 'Not found' })
+		}
+		if (slug) {
+			const keywordArray = image.keywords.split(',').filter(Boolean)
 
-		const Images = await ImagesModal.find({
-			$or: [{ name: { $regex: slug } }, { section: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
-		})
-			.skip(offset)
-			.limit(8)
-		const data = Pagination(Images, Images.length, page, slug)
-		return res.status(200).json({ success: true, page_type: 'image', message: 'fetched successfully', data })
+			const keywordRegexConditions = keywordArray.map((word) => ({
+				keywords: { $regex: word }
+			}))
+
+			const relatedImages = await ImagesModal.find({
+				_id: { $ne: image._id },
+				$or: keywordRegexConditions
+			})
+
+			return res.status(200).json({ success: true, page_type: 'image', message: 'fetched successfully', image, related_images: relatedImages })
+		} else {
+			const { page = 1 } = req.query
+			const offset = (page - 1) * 10
+
+			const Images = await ImagesModal.find({
+				$or: [{ name: { $regex: slug } }, { section: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
+			})
+				.skip(offset)
+				.limit(16)
+			const data = Pagination(Images, Images.length, page, slug)
+			return res.status(200).json({ success: true, page_type: 'search', message: 'fetched successfully', data })
+		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}

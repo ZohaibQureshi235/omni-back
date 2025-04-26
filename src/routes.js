@@ -1,5 +1,5 @@
 import express from 'express'
-import { PostImage, GetImage, updateImageViews, updatedImageLike, updateImagedowload, updateImageshare, searchImage, findImage, sectionList, getSectionImage } from '../controller/ImageController.js'
+import { PostImage, GetImage, updateImageViews, updatedImageLike, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage } from '../controller/ImageController.js'
 import multer from 'multer'
 
 const router = express.Router()
@@ -9,7 +9,6 @@ const upload = multer({ storage: storage })
 router.get('/', (req, res) => res.send('Hello There'))
 router.post('/post-image', upload.single('image'), PostImage)
 router.get('/get-images', GetImage)
-router.post('/:imageId', findImage)
 router.post('/views/:imageId', updateImageViews)
 router.post('/like/:imageId', updatedImageLike)
 router.post('/download/:imageId', updateImagedowload)

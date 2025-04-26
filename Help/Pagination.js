@@ -1,7 +1,7 @@
 const Pagination = (data, total, currentPage, url) => {
-	const lastPage = Math.ceil(total / 8)
-	const from = (currentPage - 1) * 8 + 1
-	const to = Math.min(currentPage * 8, total)
+	const lastPage = Math.ceil(total / 16)
+	const from = (currentPage - 1) * 16 + 1
+	const to = Math.min(currentPage * 16, total)
 	const baseUrl = `https://omni-back-pearl.vercel.app/api/${url}`
 
 	const links = []
@@ -24,7 +24,7 @@ const Pagination = (data, total, currentPage, url) => {
 		links,
 		next_page_url: currentPage < lastPage ? `${baseUrl}?page=${currentPage + 1}` : null,
 		path: baseUrl,
-		per_page: 8,
+		per_page: 16,
 		prev_page_url: currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null,
 		to,
 		total
