@@ -7,7 +7,12 @@ const ImageSchema = new mongoose.Schema(
 			required: true
 		},
 
-		section: {
+		short_desc: {
+			type: String,
+			required: true
+		},
+
+		image_type: {
 			type: String,
 			required: true
 		},
