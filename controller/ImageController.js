@@ -166,7 +166,7 @@ const searchImage = async (req, res) => {
 		const offset = (page - 1) * 10
 
 		const Images = await ImagesModal.find({
-			$or: [{ name: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
+			$or: [{ name: { $regex: slug } }, { section: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
 		})
 			.skip(offset)
 			.limit(8)
@@ -186,4 +186,18 @@ const sectionList = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, updatedImageLike, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList }
+const getSectionImage = async (req, res) => {
+	try {
+		const { section } = req.params
+		const { page = 1 } = req.query
+		const offset = (page - 1) * 10
+		const TotalImage = await ImagesModal.countDocuments({ section })
+		const Images = await ImagesModal.find({ section }, 'image section views _id').skip(offset).limit(8)
+		const data = Pagination(Images, TotalImage, page)
+		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+export { PostImage, GetImage, updatedImageLike, findImage, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage }
