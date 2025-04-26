@@ -7,6 +7,11 @@ const ImageSchema = new mongoose.Schema(
 			required: true
 		},
 
+		category: {
+			type: String,
+			required: true
+		},
+
 		short_desc: {
 			type: String,
 			required: true
@@ -61,7 +66,7 @@ const ImageSchema = new mongoose.Schema(
 )
 
 const SectionSchema = new mongoose.Schema({
-	section_list: {
+	category: {
 		type: String,
 		required: true
 	}

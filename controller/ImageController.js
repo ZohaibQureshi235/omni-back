@@ -12,11 +12,16 @@ cloudinary.config({
 
 const PostImage = async (req, res) => {
 	try {
-		const { title, desc, keywords, image_type, short_desc } = req.body
+		const { title, desc, keywords, image_type, short_desc, category } = req.body
 		const file = req.file
 
 		if (!file) {
 			return res.status(400).json({ success: false, message: 'No image file provided' })
+		}
+
+		const checkCategory = await SectionsModal.find({ category })
+		if (checkCategory?.length === 1) {
+			await SectionsModal.create({ category })
 		}
 
 		// Compress image with sharp
@@ -26,10 +31,7 @@ const PostImage = async (req, res) => {
 		const uploadStream = cloudinary.uploader.upload_stream(
 			{
 				resource_type: 'image',
-				public_id: title,
-				tags: keywords,
-				short_desc,
-				image_type
+				public_id: title.replace(/\s+/g, '-').toLowerCase()
 			},
 			async (error, result) => {
 				if (error) {
@@ -42,6 +44,7 @@ const PostImage = async (req, res) => {
 					keywords,
 					short_desc,
 					image_type,
+					category,
 					image: result.secure_url,
 					cloudinaryPublicId: result.public_id,
 					slug: title.replace(/\s+/g, '-').toLowerCase()
@@ -164,6 +167,19 @@ const searchImage = async (req, res) => {
 				image,
 				related_images: relatedImages
 			})
+		} else if ((await ImagesModal.countDocuments({ category: { $regex: slug, $options: 'i' } })) > 0) {
+			const Images = await ImagesModal.find({ category: { $regex: slug, $options: 'i' } })
+				.skip(offset)
+				.limit(16)
+
+			const data = Pagination(Images, Images.length, page, slug)
+
+			return res.status(200).json({
+				success: true,
+				page_type: 'category',
+				message: 'fetched successfully',
+				data
+			})
 		} else {
 			const Images = await ImagesModal.find({
 				$or: [{ name: { $regex: slug, $options: 'i' } }, { section: { $regex: slug, $options: 'i' } }, { slug: { $regex: slug, $options: 'i' } }, { description: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }]
@@ -207,6 +223,16 @@ const getSectionImage = async (req, res) => {
 		const Images = await ImagesModal.find({ section }, 'image section views _id').skip(offset).limit(16)
 		const data = Pagination(Images, TotalImage, page)
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+const fetchCat = async (req, res) => {
+	try {
+		const { category } = req.params
+		const Cat = await ImagesModal.find({ category })
+		return res.status(200).json({ success: true, message: 'Successfully fetched', data: Cat })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
