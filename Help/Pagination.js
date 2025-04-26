@@ -2,7 +2,7 @@ const Pagination = (data, total, currentPage) => {
 	const lastPage = Math.ceil(total / 8)
 	const from = (currentPage - 1) * 8 + 1
 	const to = Math.min(currentPage * 8, total)
-	const baseUrl = 'http://localhost:8000/api/get-images'
+	const baseUrl = 'https://omni-back-pearl.vercel.app/api/get-images'
 
 	const links = []
 
