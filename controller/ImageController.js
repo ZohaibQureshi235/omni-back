@@ -66,7 +66,7 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		const Images = await ImagesModal.find({}, 'image section views _id').skip(offset).limit(16)
+		const Images = await ImagesModal.find({}, 'image section views image_type _id').skip(offset).limit(16)
 
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
