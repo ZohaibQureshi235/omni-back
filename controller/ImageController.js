@@ -170,7 +170,7 @@ const searchImage = async (req, res) => {
 		})
 			.skip(offset)
 			.limit(8)
-		const data = Pagination(Images, Images.length, page, `/${slug}`)
+		const data = Pagination(Images, Images.length, page, slug)
 		return res.status(200).json({ success: true, page_type: 'image', message: 'fetched successfully', data })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
