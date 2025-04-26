@@ -230,8 +230,7 @@ const getSectionImage = async (req, res) => {
 
 const fetchCat = async (req, res) => {
 	try {
-		const { category } = req.params
-		const Cat = await ImagesModal.find({ category })
+		const Cat = await ImagesModal.find()
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data: Cat })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
