@@ -14,7 +14,7 @@ router.post('/views/:imageId', updateImageViews)
 router.post('/like/:imageId', updatedImageLike)
 router.post('/download/:imageId', updateImagedowload)
 router.post('/share/:imageId', updateImageshare)
-router.get('/search/:slug', searchImage)
+router.get('/:slug', searchImage)
 router.get('/section', sectionList)
 router.get('/find-section/:section', getSectionImage)
 
