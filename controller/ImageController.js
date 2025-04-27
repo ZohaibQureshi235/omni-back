@@ -20,7 +20,7 @@ const PostImage = async (req, res) => {
 		}
 
 		const checkCategory = await SectionsModal.find({ category })
-		if (checkCategory?.length === 1) {
+		if (checkCategory?.length !== 1) {
 			await SectionsModal.create({ category })
 		}
 
@@ -167,9 +167,9 @@ const searchImage = async (req, res) => {
 				image,
 				related_images: relatedImages
 			})
-		} else if ((await ImagesModal.countDocuments({ category: { $regex: slug, $options: 'i' } })) > 0) {
-			const Images = await ImagesModal.find({ category: { $regex: slug } })
-
+		} else if ((await ImagesModal.countDocuments({ category: slug })) > 0) {
+			const Images = await ImagesModal.find({ category: slug })
+			console.log(Images, slug)
 			return res.status(200).json({
 				success: true,
 				page_type: 'category',
@@ -177,24 +177,6 @@ const searchImage = async (req, res) => {
 				data: Images
 			})
 		} else {
-			const Images = await ImagesModal.find({
-				$or: [{ name: { $regex: slug, $options: 'i' } }, { category: { $regex: slug, $options: 'i' } }, { slug: { $regex: slug, $options: 'i' } }, { description: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }]
-			})
-				.skip(offset)
-				.limit(16)
-
-			if (Images.length > 0) {
-				const data = Pagination(Images, Images.length, page, slug)
-
-				return res.status(200).json({
-					success: true,
-					page_type: 'search',
-					message: 'fetched successfully',
-					data
-				})
-			} else {
-				return res.status(404).json({ success: false, message: 'No page found' })
-			}
 		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
@@ -226,7 +208,7 @@ const getSectionImage = async (req, res) => {
 
 const fetchCat = async (req, res) => {
 	try {
-		const Cat = await ImagesModal.find()
+		const Cat = await SectionsModal.find()
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data: Cat })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
