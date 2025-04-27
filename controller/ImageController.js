@@ -74,7 +74,6 @@ const GetImage = async (req, res) => {
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
 	} catch (error) {
-		console.error('Error in GetImage function:', error)
 		return res.status(500).json({ success: false, message: error.message })
 	}
 }
@@ -138,11 +137,7 @@ const searchImage = async (req, res) => {
 	try {
 		const { slug } = req.params
 		let image = null
-		const { page = 1 } = req.query
 
-		const offset = (page - 1) * 16
-
-		// Check if slug is a valid ObjectId
 		if (mongoose.Types.ObjectId.isValid(slug)) {
 			image = await ImagesModal.findOne({ _id: slug })
 		}
@@ -150,9 +145,8 @@ const searchImage = async (req, res) => {
 		if (image) {
 			await updateImageViews(req, res)
 			const keywordArray = image.keywords.split(',').filter(Boolean)
-
 			const keywordRegexConditions = keywordArray.map((word) => ({
-				keywords: { $regex: word, $options: 'i' } // added case insensitive search
+				keywords: { $regex: word }
 			}))
 
 			const relatedImages = await ImagesModal.find({
@@ -169,7 +163,6 @@ const searchImage = async (req, res) => {
 			})
 		} else if ((await ImagesModal.countDocuments({ category: slug })) > 0) {
 			const Images = await ImagesModal.find({ category: slug })
-			console.log(Images, slug)
 			return res.status(200).json({
 				success: true,
 				page_type: 'category',
@@ -215,4 +208,13 @@ const fetchCat = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage }
+const getAllImages = async (req, res) => {
+	try {
+		const data = await ImagesModal.find({})
+		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+export { PostImage, GetImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
