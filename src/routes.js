@@ -12,8 +12,8 @@ router.get('/get-images', GetImage)
 router.post('/views/:imageId', updateImageViews)
 router.post('/like/:imageId', updatedImageLike)
 router.post('/download/:imageId', updateImagedowload)
-router.get('/:slug', searchImage)
 router.get('/cat', fetchCat)
 router.get('/find-section/:section', getSectionImage)
+router.get('/:slug', searchImage)
 
 export default router

@@ -69,7 +69,7 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		const Images = await ImagesModal.find({}, 'image section views image_type _id').skip(offset).limit(16)
+		const Images = await ImagesModal.find({}, 'image views image_type _id').skip(offset).limit(16)
 
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
@@ -182,7 +182,7 @@ const searchImage = async (req, res) => {
 			})
 		} else {
 			const Images = await ImagesModal.find({
-				$or: [{ name: { $regex: slug, $options: 'i' } }, { section: { $regex: slug, $options: 'i' } }, { slug: { $regex: slug, $options: 'i' } }, { description: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }]
+				$or: [{ name: { $regex: slug, $options: 'i' } }, { category: { $regex: slug, $options: 'i' } }, { slug: { $regex: slug, $options: 'i' } }, { description: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }]
 			})
 				.skip(offset)
 				.limit(16)
@@ -207,8 +207,8 @@ const searchImage = async (req, res) => {
 
 const sectionList = async (req, res) => {
 	try {
-		const sections = await SectionsModal.find()
-		return res.status(200).json({ success: true, message: 'fetched successfully', sections })
+		const category = await SectionsModal.find()
+		return res.status(200).json({ success: true, message: 'fetched successfully', category })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
