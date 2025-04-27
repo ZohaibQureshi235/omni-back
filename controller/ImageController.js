@@ -168,17 +168,13 @@ const searchImage = async (req, res) => {
 				related_images: relatedImages
 			})
 		} else if ((await ImagesModal.countDocuments({ category: { $regex: slug, $options: 'i' } })) > 0) {
-			const Images = await ImagesModal.find({ category: { $regex: slug, $options: 'i' } })
-				.skip(offset)
-				.limit(16)
-
-			const data = Pagination(Images, Images.length, page, slug)
+			const Images = await ImagesModal.find({ category: { $regex: slug } })
 
 			return res.status(200).json({
 				success: true,
 				page_type: 'category',
 				message: 'fetched successfully',
-				data
+				data: Images
 			})
 		} else {
 			const Images = await ImagesModal.find({
