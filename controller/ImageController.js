@@ -217,4 +217,14 @@ const getAllImages = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
+const deleteImage = async (req, res) => {
+	try {
+		const { id } = req.params
+		await ImagesModal.deleteOne({ _id: id })
+		return res.status(200).json({ success: true, message: 'Deleted Succcessfuly' })
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+export { PostImage, GetImage, deleteImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
