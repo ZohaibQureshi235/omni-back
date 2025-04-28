@@ -170,6 +170,24 @@ const searchImage = async (req, res) => {
 				data: Images
 			})
 		} else {
+			const Images = await ImagesModal.find({
+				$or: [{ name: { $regex: slug } }, { category: { $regex: slug } }, { slug: { $regex: slug } }, { description: { $regex: slug } }, { keywords: { $regex: slug } }]
+			})
+				.skip(offset)
+				.limit(16)
+
+			if (Images.length > 0) {
+				const data = Pagination(Images, Images.length, page, slug)
+
+				return res.status(200).json({
+					success: true,
+					page_type: 'search',
+					message: 'fetched successfully',
+					data
+				})
+			} else {
+				return res.status(404).json({ success: false, message: 'No page found' })
+			}
 		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
