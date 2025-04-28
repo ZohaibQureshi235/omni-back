@@ -9,7 +9,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 connectDB()
 const port = 8000
-app.use(cors({ origin: ['http://localhost:3000', 'https://omni-verse-y9my.vercel.app', 'https://omni-back-pearl.vercel.app', 'https://zohaib-qureshi235-wall-paper-qureshi-admin-panel-adsense.vercel.app'], methods: ['GET', 'POST', 'PUT', 'DELETE'], credentials: true }))
+app.use(
+	cors({
+		origin: ['http://localhost:3000', 'https://omni-verse-y9my.vercel.app', 'https://omni-back-pearl.vercel.app', 'https://zohaib-qureshi235-wall-paper-qureshi-admin-panel-adsense.vercel.app'],
+		methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		allowedHeaders: ['Content-Type'],
+		credentials: true
+	})
+)
 
 app.use('/api', routes)
 
