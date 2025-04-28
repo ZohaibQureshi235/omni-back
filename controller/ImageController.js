@@ -62,6 +62,56 @@ const PostImage = async (req, res) => {
 	}
 }
 
+const updateImage = async (req, res) => {
+	try {
+		const { title, desc, keywords, image_type, short_desc, category } = req.body
+		const file = req.file
+
+		if (!file) {
+			return res.status(400).json({ success: false, message: 'No image file provided' })
+		}
+
+		const checkCategory = await SectionsModal.find({ category })
+		if (checkCategory?.length !== 1) {
+			await SectionsModal.create({ category })
+		}
+
+		const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 70, progressive: true }).toBuffer()
+
+		const uploadStream = cloudinary.uploader.upload_stream(
+			{
+				resource_type: 'image',
+				public_id: title.replace(/\s+/g, '-').toLowerCase()
+			},
+			async (error, result) => {
+				if (error) {
+					return res.status(500).json({ success: false, message: error.message })
+				}
+
+				const imageData = {
+					title,
+					desc,
+					keywords,
+					short_desc,
+					image_type,
+					category,
+					image: result.secure_url,
+					cloudinaryPublicId: result.public_id,
+					slug: title.replace(/\s+/g, '-').toLowerCase()
+				}
+
+				await ImagesModal.findByIdAndUpdate(imageData)
+
+				return res.status(200).json({ success: true, message: 'Successfully updated image' })
+			}
+		)
+
+		uploadStream.end(compressedImageBuffer)
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
 const GetImage = async (req, res) => {
 	try {
 		const { page = 1 } = req.query
@@ -241,4 +291,4 @@ const deleteImage = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, deleteImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
+export { PostImage, GetImage, deleteImage, updateImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
