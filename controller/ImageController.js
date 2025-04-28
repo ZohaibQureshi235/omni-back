@@ -12,7 +12,7 @@ cloudinary.config({
 
 const PostImage = async (req, res) => {
 	try {
-		const { title, desc, keywords, image_type, short_desc, category } = req.body
+		const { title, keywords, short_desc, category } = req.body
 		const file = req.file
 
 		if (!file) {
@@ -64,7 +64,7 @@ const PostImage = async (req, res) => {
 
 const updateImage = async (req, res) => {
 	try {
-		const { title, desc, keywords, image_type, short_desc, category } = req.body
+		const { title, keywords, short_desc, category } = req.body
 		const file = req.file
 
 		if (!file) {

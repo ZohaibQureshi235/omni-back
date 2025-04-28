@@ -17,17 +17,7 @@ const ImageSchema = new mongoose.Schema(
 			required: true
 		},
 
-		image_type: {
-			type: String,
-			required: true
-		},
-
 		title: {
-			type: String,
-			required: true
-		},
-
-		desc: {
 			type: String,
 			required: true
 		},
