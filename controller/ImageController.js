@@ -62,47 +62,52 @@ const PostImage = async (req, res) => {
 
 const updateImage = async (req, res) => {
 	try {
-		const { title, keywords, short_desc, category } = req.body
-		const file = req.file
+		const { image, title, keywords, short_desc, category } = req.body
+		if (typeof image !== 'string') {
+			const file = req.file
 
-		if (!file) {
-			return res.status(400).json({ success: false, message: 'No image file provided' })
-		}
-
-		const checkCategory = await SectionsModal.find({ category })
-		if (checkCategory?.length !== 1) {
-			await SectionsModal.create({ category })
-		}
-
-		const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 70, progressive: true }).toBuffer()
-
-		const uploadStream = cloudinary.uploader.upload_stream(
-			{
-				resource_type: 'image',
-				public_id: title.replace(/\s+/g, '-').toLowerCase()
-			},
-			async (error, result) => {
-				if (error) {
-					return res.status(500).json({ success: false, message: error.message })
-				}
-
-				const imageData = {
-					title,
-					keywords,
-					short_desc,
-					category,
-					image: result.secure_url,
-					cloudinaryPublicId: result.public_id,
-					slug: title.replace(/\s+/g, '-').toLowerCase()
-				}
-
-				await ImagesModal.findByIdAndUpdate(imageData)
-
-				return res.status(200).json({ success: true, message: 'Successfully updated image' })
+			if (!file) {
+				return res.status(400).json({ success: false, message: 'No image file provided' })
 			}
-		)
 
-		uploadStream.end(compressedImageBuffer)
+			const checkCategory = await SectionsModal.find({ category })
+			if (checkCategory?.length !== 1) {
+				await SectionsModal.create({ category })
+			}
+
+			const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 70, progressive: true }).toBuffer()
+
+			const uploadStream = cloudinary.uploader.upload_stream(
+				{
+					resource_type: 'image',
+					public_id: title.replace(/\s+/g, '-').toLowerCase()
+				},
+				async (error, result) => {
+					if (error) {
+						return res.status(500).json({ success: false, message: error.message })
+					}
+
+					const imageData = {
+						title,
+						keywords,
+						short_desc,
+						category,
+						image: result.secure_url,
+						cloudinaryPublicId: result.public_id,
+						slug: title.replace(/\s+/g, '-').toLowerCase()
+					}
+
+					await ImagesModal.findByIdAndUpdate(imageData)
+
+					return res.status(200).json({ success: true, message: 'Successfully updated image' })
+				}
+			)
+
+			uploadStream.end(compressedImageBuffer)
+		} else {
+			await ImagesModal.findByIdAndUpdate({ title, short_desc, category, keywords })
+			return res.status(200).json({ success: true, message: 'Successfully updated image' })
+		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
