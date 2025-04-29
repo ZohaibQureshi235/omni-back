@@ -40,10 +40,8 @@ const PostImage = async (req, res) => {
 
 				const imageData = {
 					title,
-					desc,
 					keywords,
 					short_desc,
-					image_type,
 					category,
 					image: result.secure_url,
 					cloudinaryPublicId: result.public_id,
@@ -90,10 +88,8 @@ const updateImage = async (req, res) => {
 
 				const imageData = {
 					title,
-					desc,
 					keywords,
 					short_desc,
-					image_type,
 					category,
 					image: result.secure_url,
 					cloudinaryPublicId: result.public_id,
