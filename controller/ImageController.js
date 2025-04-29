@@ -64,12 +64,16 @@ const updateImage = async (req, res) => {
 	try {
 		const { title, keywords, short_desc, category, image_id } = req.body
 		const file = req.file
-		if (file) {
-			const checkCategory = await SectionsModal.find({ category })
-			if (checkCategory?.length !== 1) {
-				await SectionsModal.create({ category })
-			}
 
+		if (!image_id) {
+			return res.status(400).json({ success: false, message: 'Image ID is required' })
+		}
+
+		const checkCategory = await SectionsModal.find({ category })
+		if (checkCategory?.length !== 1) {
+			await SectionsModal.create({ category })
+		}
+		if (file) {
 			const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 70, progressive: true }).toBuffer()
 
 			const uploadStream = cloudinary.uploader.upload_stream(
@@ -92,7 +96,7 @@ const updateImage = async (req, res) => {
 						slug: title.replace(/\s+/g, '-').toLowerCase()
 					}
 
-					await ImagesModal.updateOne(imageData, { _id: image_id })
+					await ImagesModal.updateOne({ _id: image_id }, imageData)
 
 					return res.status(200).json({ success: true, message: 'Successfully updated image' })
 				}
@@ -100,7 +104,7 @@ const updateImage = async (req, res) => {
 
 			uploadStream.end(compressedImageBuffer)
 		} else {
-			await ImagesModal.updateOne({ title, short_desc, category, keywords }, { _id: image_id })
+			await ImagesModal.updateOne({ _id: image_id }, { title, keywords, short_desc, category })
 			return res.status(200).json({ success: true, message: 'Successfully updated image' })
 		}
 	} catch (error) {
