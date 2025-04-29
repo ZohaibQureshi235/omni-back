@@ -1,5 +1,5 @@
 import express from 'express'
-import { PostImage, GetImage, updateImageViews, updateImage, updatedImageLike, updateImagedowload, searchImage, getSectionImage, fetchCat, getAllImages, deleteImage } from '../controller/ImageController.js'
+import { PostImage, GetImage, updateImageViews, updateImage, updatedImageLike, updateImagedowload, searchImage, getSectionImage, fetchCat, getAllImages, deleteImage, getImageByslug, getCatImageBySlug, sendMessage } from '../controller/ImageController.js'
 import multer from 'multer'
 
 const router = express.Router()
@@ -17,6 +17,9 @@ router.get('/cat', fetchCat)
 router.get('/find-section/:section', getSectionImage)
 router.get('/image', getAllImages)
 router.delete('/delete/:id', deleteImage)
+router.get('/:cat/:slug', getImageByslug)
+router.get(/^\/(.+)-wallpaper$/, getCatImageBySlug)
 router.get('/:slug', searchImage)
+router.post('/send-message', sendMessage)
 
 export default router

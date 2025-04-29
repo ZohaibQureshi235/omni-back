@@ -1,8 +1,9 @@
-import mongoose from 'mongoose'
 import { ImagesModal, SectionsModal } from '../modals/ImagesModal.js'
 import { v2 as cloudinary } from 'cloudinary'
 import sharp from 'sharp'
 import Pagination from '../Help/Pagination.js'
+import mongoose from 'mongoose'
+import nodemailer from 'nodemailer'
 
 cloudinary.config({
 	cloud_name: 'dobuzvxes',
@@ -119,7 +120,7 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(16)
+		const Images = await ImagesModal.find({}, 'image category slug downloads views _id').skip(offset).limit(16)
 
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
@@ -130,11 +131,12 @@ const GetImage = async (req, res) => {
 
 const updateImageViews = async (req, res) => {
 	try {
-		const { slug } = req.params
-		const updatedImage = await ImagesModal.findByIdAndUpdate(slug, { $inc: { views: 1 } }, { new: true })
+		const { cat, slug } = req.params
+		const updatedImage = await ImagesModal.findOneAndUpdate({ slug }, { $inc: { views: 1 } }, { new: true })
+
 		return updatedImage
 	} catch (error) {
-		return res.status(500).json({ success: false, message: error.message })
+		return null
 	}
 }
 
@@ -185,58 +187,76 @@ const updateImageshare = async (req, res) => {
 
 const searchImage = async (req, res) => {
 	try {
-		const { slug } = req.params
-		let image = null
+		let { slug } = req.params
+		slug = slug.replace(/-/g, ' ')
+		const Images = await ImagesModal.find({
+			$or: [{ title: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }, { category: { $regex: slug, $options: 'i' } }]
+		})
+		console.log(Images)
 
+		return res.status(200).json({
+			success: true,
+			page_type: 'search',
+			message: 'fetched successfully',
+			data: Images
+		})
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+const getImageByslug = async (req, res) => {
+	try {
+		const { cat, slug } = req.params
+		let image = null
 		if (mongoose.Types.ObjectId.isValid(slug)) {
-			image = await ImagesModal.findOne({ _id: slug })
+			image = await ImagesModal.findOne({ slug })
+		}
+		image = await ImagesModal.findOne({ slug })
+
+		// Check if image exists BEFORE doing anything
+		if (!image) {
+			return res.status(404).json({ success: false, message: 'No page found' })
 		}
 
+		await updateImageViews(req, res) // Ensure this doesn't send a response itself
+
+		const keywordArray = image.keywords.split(',').filter(Boolean)
+		const keywordRegexConditions = keywordArray.map((word) => ({
+			keywords: { $regex: word }
+		}))
+
+		const relatedImages = await ImagesModal.find({
+			_id: { $ne: image._id },
+			$or: keywordRegexConditions
+		})
 		if (image) {
-			await updateImageViews(req, res)
-			const keywordArray = image.keywords.split(',').filter(Boolean)
-			const keywordRegexConditions = keywordArray.map((word) => ({
-				keywords: { $regex: word }
-			}))
-
-			const relatedImages = await ImagesModal.find({
-				_id: { $ne: image._id },
-				$or: keywordRegexConditions
-			})
-
 			return res.status(200).json({
 				success: true,
+				message: 'Fetched successfully',
 				page_type: 'image',
-				message: 'fetched successfully',
 				image,
 				related_images: relatedImages
 			})
-		} else if ((await ImagesModal.countDocuments({ category: slug })) > 0) {
-			const Images = await ImagesModal.find({ category: slug })
-			return res.status(200).json({
-				success: true,
-				page_type: 'category',
-				message: 'fetched successfully',
-				data: Images
-			})
 		} else {
-			const slugs = `[${slug}]`
-			console.log('images', Images, slugs)
-			const Images = await ImagesModal.find({
-				$or: [{ title: { $regex: slugs, $options: 'i' } }, { category: { $regex: slugs, $options: 'i' } }, { short_desc: { $regex: slugs, $options: 'i' } }, { keywords: { $regex: slugs, $options: 'i' } }]
-			})
-
-			if (Images.length > 0) {
-				return res.status(200).json({
-					success: true,
-					page_type: 'search',
-					message: 'fetched successfully',
-					data: Images
-				})
-			} else {
-				return res.status(404).json({ success: false, message: 'No page found' })
-			}
+			return res.status(404).json({ success: false, message: '404' })
 		}
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+const getCatImageBySlug = async (req, res) => {
+	try {
+		let slug = req.params[0]
+		slug = slug.charAt(0).toUpperCase() + slug.slice(1)
+		const Images = await ImagesModal.find({ category: slug })
+		return res.status(200).json({
+			success: true,
+			page_type: 'category',
+			message: 'fetched successfully',
+			data: Images
+		})
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
@@ -289,4 +309,65 @@ const deleteImage = async (req, res) => {
 	}
 }
 
-export { PostImage, GetImage, deleteImage, updateImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
+const sendMessage = async (req, res) => {
+	try {
+		try {
+			const { full_name, subject, email, message } = req.body
+
+			const mail1 = {
+				from: 'hello@iamzohaib.com',
+				to: 'zohaibqureshi754@gmail.com',
+				subject,
+				html: `
+          <div style="width: 100%; background-color: #f3f9ff; padding: 5rem 0">
+            <div style="max-width: 700px; background-color: white; margin: 0 auto">
+              <div style="width: 100%; background-color: #00efbc; padding: 20px 0">
+                <h1 style="display:flex;align-items:center;justify-content:center; text-align: center">${email}</h1>
+              </div>
+              <div style="width: 100%; gap: 10px; padding: 30px 0; display: grid">
+                <p style="font-weight: 800; font-size: 1.2rem; padding: 0 30px">
+                  Form Shoeshop Store
+                </p>
+                <div style="font-size: .8rem; margin: 0 30px">
+                  <p>FullName: <b>${full_name}</b></p>
+                  <p>Email: <b>${email}</b></p>
+                  <p>Message: <i>${message}</i></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+			}
+
+			const transporter = nodemailer.createTransport({
+				host: 'live.smtp.mailtrap.io',
+				port: 587,
+				secure: false,
+				auth: {
+					user: 'api',
+					pass: 'efc1a9569a36d90c5407c8a78c248f03'
+					// user: process.env.NODE_MAIL_USER_NAME || 'api',
+					// pass: process.env.NODE_MAIL_PASSWORD || 'efc1a9569a36d90c5407c8a78c248f03'
+				}
+			})
+
+			// Send both emails in parallel
+			await Promise.all([transporter.sendMail(mail1)])
+
+			res.json({
+				success: true,
+				message: 'Your message was sent successfully'
+			})
+		} catch (error) {
+			console.error('Error sending email:', error)
+			res.status(500).json({
+				success: false,
+				error: 'Failed to send message. Please try again later.'
+			})
+		}
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
+}
+
+export { PostImage, GetImage, sendMessage, getCatImageBySlug, getImageByslug, deleteImage, updateImage, fetchCat, updatedImageLike, updateImageViews, updateImagedowload, updateImageshare, searchImage, sectionList, getSectionImage, getAllImages }
