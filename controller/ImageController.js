@@ -62,14 +62,9 @@ const PostImage = async (req, res) => {
 
 const updateImage = async (req, res) => {
 	try {
-		const { image, title, keywords, short_desc, category } = req.body
-		if (typeof image !== 'string') {
-			const file = req.file
-
-			if (!file) {
-				return res.status(400).json({ success: false, message: 'No image file provided' })
-			}
-
+		const { title, keywords, short_desc, category } = req.body
+		const file = req.file
+		if (file) {
 			const checkCategory = await SectionsModal.find({ category })
 			if (checkCategory?.length !== 1) {
 				await SectionsModal.create({ category })
@@ -120,7 +115,7 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		const Images = await ImagesModal.find({}, 'image views image_type _id').skip(offset).limit(16)
+		const Images = await ImagesModal.find({}, 'image views _id').skip(offset).limit(16)
 
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
@@ -253,12 +248,8 @@ const sectionList = async (req, res) => {
 const getSectionImage = async (req, res) => {
 	try {
 		const { section } = req.params
-		const { page = 1 } = req.query
-		const offset = (page - 1) * 16
-		const TotalImage = await ImagesModal.countDocuments({ section })
-		const Images = await ImagesModal.find({ section }, 'image section views _id').skip(offset).limit(16)
-		const data = Pagination(Images, TotalImage, page)
-		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
+		const Images = await ImagesModal.find({ section })
+		return res.status(200).json({ success: true, message: 'Successfully fetched', data: Images })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
