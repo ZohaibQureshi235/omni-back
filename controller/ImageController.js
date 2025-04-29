@@ -220,8 +220,10 @@ const searchImage = async (req, res) => {
 				data: Images
 			})
 		} else {
+			const slugs = `[${slug}]`
+			console.log('images', Images, slugs)
 			const Images = await ImagesModal.find({
-				$or: [{ name: { $regex: slug } }, { category: { $regex: slug } }, { short_desc: { $regex: slug } }, { keywords: { $regex: slug } }]
+				$or: [{ title: { $regex: slugs, $options: 'i' } }, { category: { $regex: slugs, $options: 'i' } }, { short_desc: { $regex: slugs, $options: 'i' } }, { keywords: { $regex: slugs, $options: 'i' } }]
 			})
 
 			if (Images.length > 0) {
