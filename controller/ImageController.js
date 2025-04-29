@@ -62,7 +62,7 @@ const PostImage = async (req, res) => {
 
 const updateImage = async (req, res) => {
 	try {
-		const { title, keywords, short_desc, category } = req.body
+		const { title, keywords, short_desc, category, image_id } = req.body
 		const file = req.file
 		if (file) {
 			const checkCategory = await SectionsModal.find({ category })
@@ -92,7 +92,7 @@ const updateImage = async (req, res) => {
 						slug: title.replace(/\s+/g, '-').toLowerCase()
 					}
 
-					await ImagesModal.findByIdAndUpdate(imageData)
+					await ImagesModal.updateOne(imageData, { _id: image_id })
 
 					return res.status(200).json({ success: true, message: 'Successfully updated image' })
 				}
@@ -100,7 +100,7 @@ const updateImage = async (req, res) => {
 
 			uploadStream.end(compressedImageBuffer)
 		} else {
-			await ImagesModal.findByIdAndUpdate({ title, short_desc, category, keywords })
+			await ImagesModal.updateOne({ title, short_desc, category, keywords }, { _id: image_id })
 			return res.status(200).json({ success: true, message: 'Successfully updated image' })
 		}
 	} catch (error) {
