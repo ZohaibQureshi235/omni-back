@@ -251,6 +251,13 @@ const getCatImageBySlug = async (req, res) => {
 		let slug = req.params[0]
 		slug = slug.charAt(0).toUpperCase() + slug.slice(1)
 		const Images = await ImagesModal.find({ category: slug })
+
+		// Shuffle the images
+		for (let i = Images.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1))
+			;[Images[i], Images[j]] = [Images[j], Images[i]]
+		}
+
 		return res.status(200).json({
 			success: true,
 			page_type: 'category',
