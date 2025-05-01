@@ -250,7 +250,7 @@ const getCatImageBySlug = async (req, res) => {
 	try {
 		let slug = req.params[0]
 		slug = slug.charAt(0).toUpperCase() + slug.slice(1)
-		const Images = await ImagesModal.find({ category: slug })
+		const Images = await ImagesModal.find({ category: slug.replace(/-/g, ' ') })
 
 		// Shuffle the images
 		for (let i = Images.length - 1; i > 0; i--) {
