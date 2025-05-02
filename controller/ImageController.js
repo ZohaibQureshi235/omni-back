@@ -192,13 +192,19 @@ const searchImage = async (req, res) => {
 		const Images = await ImagesModal.find({
 			$or: [{ title: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }, { category: { $regex: slug, $options: 'i' } }]
 		})
-
-		return res.status(200).json({
-			success: true,
-			page_type: 'search',
-			message: 'fetched successfully',
-			data: Images
-		})
+		if (Images.length > 0) {
+			return res.status(200).json({
+				success: true,
+				page_type: 'search',
+				message: 'fetched successfully',
+				data: Images
+			})
+		} else {
+			return res.status(404).json({
+				success: false,
+				message: 'No images found'
+			})
+		}
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
