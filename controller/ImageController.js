@@ -191,18 +191,19 @@ const updateImageshare = async (req, res) => {
 const searchImage = async (req, res) => {
 	try {
 		let { slug } = req.params
-		slug = slug.replace(/-/g, ' ')
+		slug = slug.replace(/-/g, ' ').toLowerCase()
 		console.log(slug)
 
 		const searchWords = slug.split(' ').filter(Boolean)
 		const regexConditions = searchWords
-			.filter((word) => word.toLowerCase() !== 'wallpaper')
+			.filter((word) => word !== 'wallpaper')
 			.map((word) => ({
-				$or: [{ title: { $regex: word, $options: 'i' } }, { keywords: { $regex: word, $options: 'i' } }, { category: { $regex: word, $options: 'i' } }]
+				$or: [{ keywords: { $regex: new RegExp(`\\b${word}\\b`, 'i') } }, { category: { $regex: new RegExp(`\\b${word}\\b`, 'i') } }]
 			}))
 
 		// Use $or instead of $and to match any word in the search
 		const Images = await ImagesModal.find({ $or: regexConditions })
+		console.log(Images?.length)
 		return res.status(200).json({
 			success: true,
 			page_type: 'search',
