@@ -18,7 +18,7 @@ router.get('/find-section/:section', getSectionImage)
 router.get('/image', getAllImages)
 router.delete('/delete/:id', deleteImage)
 router.get('/:cat/:slug', getImageByslug)
-router.get(/^\/(.+)-wallpaper$/, getCatImageBySlug)
+router.get(/^\/(.+)-wallpapers$/, getCatImageBySlug)
 router.get('/:slug', searchImage)
 router.post('/send-message', sendMessage)
 

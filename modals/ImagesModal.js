@@ -7,6 +7,11 @@ const ImageSchema = new mongoose.Schema(
 			required: true
 		},
 
+		original_image: {
+			type: String,
+			required: true
+		},
+
 		category: {
 			type: String,
 			required: true
