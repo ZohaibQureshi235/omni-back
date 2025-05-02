@@ -56,9 +56,12 @@ const PostImage = async (req, res) => {
 			slug: title.replace(/\s+/g, '-').toLowerCase()
 		}
 
+		// Add the new image to the top of the array
 		await ImagesModal.create(imageData)
 
-		return res.status(200).json({ success: true, message: 'Successfully uploaded both images' })
+		const updatedImages = await ImagesModal.find().sort({ _id: -1 }) // Sort by newest first
+
+		return res.status(200).json({ success: true, message: 'Successfully uploaded both images', data: updatedImages })
 	} catch (error) {
 		return res.status(500).json({ success: false, message: error.message })
 	}
