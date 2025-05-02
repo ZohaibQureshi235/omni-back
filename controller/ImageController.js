@@ -198,7 +198,9 @@ const searchImage = async (req, res) => {
 			message: 'fetched successfully',
 			data: Images
 		})
-	} catch (error) {}
+	} catch (error) {
+		return res.status(500).json({ success: false, message: error.message })
+	}
 }
 
 const getImageByslug = async (req, res) => {
