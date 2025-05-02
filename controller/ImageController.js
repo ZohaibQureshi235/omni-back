@@ -192,9 +192,17 @@ const searchImage = async (req, res) => {
 	try {
 		let { slug } = req.params
 		slug = slug.replace(/-/g, ' ')
-		const Images = await ImagesModal.find({
-			$or: [{ title: { $regex: slug, $options: 'i' } }, { keywords: { $regex: slug, $options: 'i' } }, { category: { $regex: slug, $options: 'i' } }]
-		})
+		console.log(slug)
+
+		const searchWords = slug.split(' ').filter(Boolean)
+		const regexConditions = searchWords
+			.filter((word) => word.toLowerCase() !== 'wallpaper')
+			.map((word) => ({
+				$or: [{ title: { $regex: word, $options: 'i' } }, { keywords: { $regex: word, $options: 'i' } }, { category: { $regex: word, $options: 'i' } }]
+			}))
+
+		// Use $or instead of $and to match any word in the search
+		const Images = await ImagesModal.find({ $or: regexConditions })
 		return res.status(200).json({
 			success: true,
 			page_type: 'search',
