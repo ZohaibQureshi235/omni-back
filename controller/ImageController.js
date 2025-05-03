@@ -193,28 +193,65 @@ const updateImageshare = async (req, res) => {
 
 const searchImage = async (req, res) => {
 	try {
+		const stopWords = new Set(['on', 'is', 'the', 'a', 'of', 'an', 'and', 'in', 'to', 'for', 'with', 'by', 'at', 'from', 'that', 'this', 'it'])
 		let { slug } = req.params
+
+		// Step 1: Preprocess slug
 		slug = slug.replace(/-/g, ' ').toLowerCase()
-		console.log(slug)
+		console.log('Processed slug:', slug)
 
-		const searchWords = slug.split(' ').filter(Boolean)
-		const regexConditions = searchWords
-			.filter((word) => word !== 'wallpaper')
-			.map((word) => ({
-				$or: [{ keywords: { $regex: new RegExp(`\\b${word}\\b`, 'i') } }, { category: { $regex: new RegExp(`\\b${word}\\b`, 'i') } }]
-			}))
+		// Step 2: Extract search words, filter out stop words and 'wallpaper'
+		const searchWords = slug
+			.split(' ')
+			.map((word) => word.trim())
+			.filter((word) => word && word !== 'wallpaper' && !stopWords.has(word))
 
-		// Use $or instead of $and to match any word in the search
-		const Images = await ImagesModal.find({ $or: regexConditions })
-		console.log(Images?.length)
+		console.log('Search words:', searchWords)
+
+		// Step 3: Build regex conditions
+		const regexConditions = searchWords.map((word) => ({
+			keywords: { $regex: new RegExp(word, 'i') }
+		}))
+
+		console.log('Regex Conditions:', JSON.stringify(regexConditions))
+
+		let Images = []
+
+		// Step 4: Use aggregation if many words, else simple query
+		if (searchWords.length > 2) {
+			Images = await ImagesModal.aggregate([
+				{ $match: { $or: regexConditions } },
+				{
+					$addFields: {
+						matchCount: {
+							$size: {
+								$setIntersection: [searchWords, { $split: ['$keywords', ','] }]
+							}
+						}
+					}
+				},
+				{ $sort: { matchCount: -1 } },
+				{ $limit: 30 } // optional: limit to top 30 matches
+			])
+		} else {
+			Images = await ImagesModal.find({ $or: regexConditions }).limit(30)
+		}
+
+		console.log('Images found:', Images.length)
+
 		return res.status(200).json({
 			success: true,
 			page_type: 'search',
-			message: 'fetched successfully',
+			message: 'Fetched successfully',
 			data: Images
 		})
-	} catch (error) {
-		return res.status(500).json({ success: false, message: error.message })
+	} catch (err) {
+		console.error('Error fetching images:', err)
+		return res.status(500).json({
+			success: false,
+			message: 'Server error',
+			error: err.message
+		})
 	}
 }
 
