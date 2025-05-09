@@ -126,7 +126,12 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		const Images = await ImagesModal.find({}, 'image category slug downloads views _id').skip(offset).limit(16)
+		let Images = await ImagesModal.find({}, 'image category slug downloads views _id').skip(offset).limit(16)
+
+		// Shuffle only if it's the first page
+		if (Number(page) === 1) {
+			Images = Images.sort(() => Math.random() - 0.5)
+		}
 
 		const data = Pagination(Images, TotalImage, page, 'get-images')
 		return res.status(200).json({ success: true, message: 'Successfully fetched', data })
