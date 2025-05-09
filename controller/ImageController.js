@@ -83,33 +83,39 @@ const updateImage = async (req, res) => {
 		if (file) {
 			const compressedImageBuffer = await sharp(file.buffer).resize({ width: 1080, withoutEnlargement: true }).jpeg({ quality: 70, progressive: true }).toBuffer()
 
-			const uploadStream = cloudinary.uploader.upload_stream(
-				{
-					resource_type: 'image',
-					public_id: title.replace(/\s+/g, '-').toLowerCase()
-				},
-				async (error, result) => {
-					if (error) {
-						return res.status(500).json({ success: false, message: error.message })
-					}
+			// Helper function to upload buffer
+			const uploadToCloudinary = (buffer, publicId) =>
+				new Promise((resolve, reject) => {
+					cloudinary.uploader
+						.upload_stream({ resource_type: 'image', public_id: publicId }, (error, result) => {
+							if (error) return reject(error)
+							resolve(result)
+						})
+						.end(buffer)
+				})
 
-					const imageData = {
-						title,
-						keywords,
-						short_desc,
-						category,
-						image: result.secure_url,
-						cloudinaryPublicId: result.public_id,
-						slug: title.replace(/\s+/g, '-').toLowerCase()
-					}
+			// Upload compressed image
+			const compressedResult = await uploadToCloudinary(compressedImageBuffer, `${title.replace(/\s+/g, '-').toLowerCase()}-compressed`)
 
-					await ImagesModal.updateOne({ _id: image_id }, imageData)
+			// Upload original image
+			const originalResult = await uploadToCloudinary(file.buffer, `${title.replace(/\s+/g, '-').toLowerCase()}-original`)
 
-					return res.status(200).json({ success: true, message: 'Successfully updated image' })
-				}
-			)
+			const imageData = {
+				title,
+				keywords,
+				short_desc,
+				category,
+				image: compressedResult.secure_url,
+				original_image: originalResult.secure_url,
+				cloudinaryPublicId: compressedResult.public_id,
+				slug: title.replace(/\s+/g, '-').toLowerCase()
+			}
 
-			uploadStream.end(compressedImageBuffer)
+			// Add the new image to the top of the array
+
+			await ImagesModal.updateOne({ _id: image_id }, imageData)
+
+			return res.status(200).json({ success: true, message: 'Successfully updated image' })
 		} else {
 			await ImagesModal.updateOne({ _id: image_id }, { title, keywords, short_desc, category })
 			return res.status(200).json({ success: true, message: 'Successfully updated image' })
@@ -126,7 +132,7 @@ const GetImage = async (req, res) => {
 
 		const TotalImage = await ImagesModal.countDocuments()
 
-		let Images = await ImagesModal.find({}, 'image category slug downloads views _id').skip(offset).limit(16)
+		let Images = await ImagesModal.find({}, 'image category slug downloads original_image views _id').skip(offset).limit(16)
 
 		// Shuffle only if it's the first page
 		if (Number(page) === 1) {
