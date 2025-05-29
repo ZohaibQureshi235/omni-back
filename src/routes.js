@@ -19,7 +19,7 @@ router.get('/image', getAllImages)
 router.delete('/delete/:id', deleteImage)
 router.get('/:cat/:slug', getImageByslug)
 router.get(/^\/(.+)-wallpapers$/, getCatImageBySlug)
-router.get('/:slug', searchImage)
+router.get('/search-results/:slug', searchImage)
 router.post('/send-message', sendMessage)
 
 export default router
